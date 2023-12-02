@@ -1,0 +1,50 @@
+/*
+ * File:   bt52.2
+ * Author: nbtin
+ *
+ * Created on March 1, 2023, 12:54 AM
+ */
+
+
+#include <xc.h>
+#include "header.h"
+#define F_CPU 1000000
+#include <util/delay.h>
+unsigned int i1=0,i2=0;
+
+void main(void) {
+    MCUCR |= 0x80;
+    DDRB=0xff;
+    SevenSegOff();
+    Motors.DC1= STOP;
+    Motors.DC2= STOP;
+    MOTOR_ACTIVATION;
+    while(1)
+    {
+        READKEY;
+        if(PINB==0x10)
+        {
+            while(PINB==0x10) ;
+            i1++;
+        }
+        if(PINB==0x20)
+        {
+            while(PINB==0x20) ;
+            i2++;
+        }
+        //-------------------------------
+        LED7D2=SegCode[Motors.DC1];
+        LED7D1=SegCode[Motors.DC2];
+        if(i1>3) i1=0;
+        if(i2>3) i2=0;
+        //-------------------------------
+        if(i1%2==0) Motors.DC1= STOP;
+        else if(i1%3==0) Motors.DC1= REWARD;
+        else  Motors.DC1= FORWARD;
+        if(i2%2==0) Motors.DC2= STOP;
+        else if(i2%3==0)  Motors.DC2= REWARD;
+        else Motors.DC2= FORWARD;
+        MOTOR_ACTIVATION;
+    }
+    return;
+} 
